@@ -109,7 +109,9 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */,
     "paths": {
       "@myrepo/*": ["./packages/*/src/index.ts"]
-    }
+    },
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true
   },
   "exclude": [
     "node_modules",
