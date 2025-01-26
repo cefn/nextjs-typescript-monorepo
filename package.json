@@ -1,0 +1,30 @@
+{
+  "name": "nextjs-typescript-monorepo",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "validate": "tsx tooling/validate/cli.ts",
+    "validate:fix": "pnpm validate --fix"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^22.10.10",
+    "chalk": "^5.4.1",
+    "json-diff": "^1.0.6",
+    "lodash-es": "^4.17.21",
+    "minimatch": "^10.0.1",
+    "only-allow": "^1.2.1",
+    "prettier": "^3.4.2",
+    "tsx": "^4.19.2",
+    "zx": "^8.3.0"
+  },
+  "packageManager": "pnpm@9.15.2",
+  "engines": {
+    "node": ">=22"
+  }
+}
