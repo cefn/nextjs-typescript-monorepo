@@ -2,9 +2,20 @@
   "name": "express-with-dependencies",
   "version": "0.0.0",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test:sum": "(node --import tsx src/index.ts & wait-on 'http://localhost:8165' && curl 'http://localhost:8165/sum?a=2&b=4'; kill $(jobs -p))",
+    "test:multiply": "(node --import tsx src/index.ts & wait-on 'http://localhost:8165' && curl 'http://localhost:8165/multiply?a=2&b=4'; kill $(jobs -p))"
   },
   "license": "MIT",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "dependencies": {
+    "@myrepo/multiply": "workspace:^",
+    "@myrepo/sum": "workspace:^",
+    "express": "^4.21.2",
+    "tsx": "^4.19.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "wait-on": "^8.0.2"
+  }
 }

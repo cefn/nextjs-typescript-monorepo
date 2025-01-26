@@ -1,6 +1,5 @@
-import { byPackageName, byParentFolder } from "./lib/rules/factories.js";
+import { byParentFolder } from "./lib/rules/factories.js";
 import { getPackageSlug } from "./lib/rules/packages.js";
-import { getRelativePackagePath } from "./lib/util.js";
 import { PackageJsonSpec } from "./types.js";
 
 export const PACKAGE_JSON_RULES = {

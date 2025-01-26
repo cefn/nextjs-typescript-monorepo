@@ -19,5 +19,8 @@
         "default": "./dist/index.cjs"
       }
     }
+  },
+  "dependencies": {
+    "@myrepo/sum": "workspace:^"
   }
 }

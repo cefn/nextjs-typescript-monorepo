@@ -5,4 +5,5 @@ export function multiply(a: number, b: number) {
   for (let count = 0; count < b; count++) {
     total = sum(total, a);
   }
+  return total;
 }
