@@ -25,10 +25,10 @@
   },
   "references": [
     {
-      "path": "../../packages/sum"
+      "path": "../../modules/sum"
     },
     {
-      "path": "../../packages/multiply"
+      "path": "../../modules/multiply"
     }
   ],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

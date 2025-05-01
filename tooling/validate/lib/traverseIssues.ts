@@ -3,14 +3,14 @@ import { writeFileSync } from "fs";
 import { sep } from "path";
 import { $ } from "zx/core";
 
-import type { AbsolutePath, ErrorReport, PackageMeta } from "../types.js";
+import type { AbsolutePath, ErrorReport, PackageMeta } from "../types.ts";
 import {
   listPackageJsonIssues,
   listPackageJsonPaths,
   loadPackageMeta,
-} from "./listRuleIssues.js";
-import { listPackageSkeletonIssues } from "./listSkeletonIssues.js";
-import { SKELETON_RSYNC_OPTIONS } from "./util.js";
+} from "./listRuleIssues.ts";
+import { listPackageSkeletonIssues } from "./listSkeletonIssues.ts";
+import { SKELETON_RSYNC_OPTIONS } from "./util.ts";
 
 export async function traverseIssues(
   fixRequested: boolean,
@@ -23,8 +23,7 @@ export async function traverseIssues(
     errorsFixed += report.errorsFixed;
   }
 
-  const packagePaths = [...await listPackageJsonPaths(glob)];
-  for (const packagePath of packagePaths) {
+  for (const packagePath of await listPackageJsonPaths(glob)) {
     const packageMeta = loadPackageMeta(packagePath);
     aggregateErrors(traverseJsonIssues(packageMeta, fixRequested));
     aggregateErrors(await traverseSkeletonIssues(packageMeta, fixRequested));

@@ -2,16 +2,16 @@ import { readdirSync, statSync } from "fs";
 import { dirname } from "path";
 import { $ } from "zx/core";
 
-import { AbsolutePath, PackageMeta, PackageSkeletonIssue } from "../types.js";
-import { getPackageType } from "./rules/packages.js";
+import { AbsolutePath, PackageMeta, PackageSkeletonIssue } from "../types.ts";
+import { getPackageType } from "./rules/packages.ts";
 import {
   getToolingPath,
   resolveAbsolute,
   SKELETON_RSYNC_OPTIONS,
-} from "./util.js";
+} from "./util.ts";
 
 export async function* listPackageSkeletonIssues(packageMeta: PackageMeta) {
-  const roots = ["shared", getPackageType(packageMeta)] as const; // e.g. ["shared", "servers"] or ["shared", "packages"]
+  const roots = ["shared", getPackageType(packageMeta)] as const; // e.g. ["shared", "servers"] or ["shared", "modules"]
   for (const root of roots) {
     const referencePath = resolveAbsolute(
       getToolingPath(),

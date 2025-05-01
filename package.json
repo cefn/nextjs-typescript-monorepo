@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "validate": "tsx tooling/validate/cli.ts",
+    "validate": "cd tooling/validate && pnpm run validate",
     "validate:fix": "pnpm validate --fix"
   },
   "keywords": [],

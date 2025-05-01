@@ -2,7 +2,9 @@ import { parseArgs } from "node:util";
 
 import chalk from "chalk";
 
-import { traverseIssues } from "./lib/traverseIssues.js";
+import { traverseIssues } from "./lib/traverseIssues.ts";
+
+const rulesPath = import.meta.resolve("./ruleConfig.ts");
 
 // read --fix or -f arg
 const args = process.argv.slice(2);
@@ -25,7 +27,7 @@ const { errorsFixed, errorsFound } = await traverseIssues(fix, glob);
 // report validation result to console
 const message =
   errorsFound > 0
-    ? `TOTAL VALIDATION ERRORS ${errorsFound} FIXED ${errorsFixed}`
+    ? `TOTAL VALIDATION ERRORS ${errorsFound} FIXED ${errorsFixed} (See ${rulesPath} )`
     : `NO VALIDATION ERRORS FOUND`;
 
 const { bgGreenBright, bgYellowBright, bgRedBright } = chalk;

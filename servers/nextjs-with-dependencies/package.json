@@ -6,14 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "compile": "tsc --noEmit",
+    "changeset": "echo 'Please run `pnpm changeset` from the monorepo root'"
   },
   "dependencies": {
     "@myrepo/multiply": "workspace:^",
     "@myrepo/sum": "workspace:^",
     "next": "15.1.6",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "typescript": "^5.8.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -23,7 +26,16 @@
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
     "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5"
+    "tailwindcss": "^3.4.1"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cefn/nextjs-typescript-monorepo.git",
+    "directory": "servers/nextjs-with-dependencies"
+  },
+  "homepage": "https://github.com/cefn/nextjs-typescript-monorepo/tree/main/servers/nextjs-with-dependencies/README.md",
+  "bugs": {
+    "url": "https://github.com/cefn/nextjs-typescript-monorepo/issues"
   }
 }

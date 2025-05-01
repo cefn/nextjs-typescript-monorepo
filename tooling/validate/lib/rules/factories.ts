@@ -1,12 +1,14 @@
-/** Canonical 'ValueFactories' that offer semantic sugar
- * with rich editor support for defining alternate package.json
- * validation according to gross features of a package.
+/**
+ * Canonical 'ValueFactories' that offer semantic sugar with rich editor support
+ * for defining alternate package.json validation according to gross features of
+ * a package.
  */
 
-import { ValueFactory, ValueRule } from "../../types.js";
-import { getPackageType, PackageType } from "./packages.js";
+import { ValueFactory, ValueRule } from "../../types.ts";
+import { maybeRegExp } from "../util.ts";
+import { getPackageType, PackageType } from "./packages.ts";
 
-/** ValueFactory with distinct values for PackageType 'packages' or 'servers' */
+/** ValueFactory with distinct values for PackageType 'modules' or 'servers' */
 export function byParentFolder(
   lookup: Partial<Record<PackageType, ValueRule>>,
 ): ValueFactory {
@@ -23,8 +25,11 @@ export function byPackageName(
 ): ValueFactory {
   return ({ packageJson }) => {
     const { name } = packageJson;
-    if (name in lookup) {
-      return lookup[name];
+    for (const [key, rule] of Object.entries(lookup)) {
+      const regexKey = maybeRegExp(key);
+      if (key === name || regexKey?.test(name)) {
+        return rule;
+      }
     }
     return fallback;
   };

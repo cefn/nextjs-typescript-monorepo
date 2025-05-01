@@ -1,0 +1,21 @@
+{
+  "name": "validate",
+  "private": true,
+  "description": "CLI to traverse all package.json files in repo and assert rules",
+  "type": "module",
+  "scripts": {
+    "validate": "pnpm install --ignore-workspace && pnpm exec tsx ./cli.ts"
+  },
+  "devDependencies": {
+    "@types/json-diff": "^1.0.3",
+    "@types/lodash-es": "^4.17.12",
+    "@types/node": "^22.14.1",
+    "chalk": "^5.3.0",
+    "json-diff": "^1.0.6",
+    "lodash-es": "^4.17.21",
+    "minimatch": "^10.0.1",
+    "tsx": "^4.19.3",
+    "zod": "^3.24.2",
+    "zx": "^8.5.2"
+  }
+}

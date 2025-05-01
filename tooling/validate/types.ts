@@ -1,13 +1,25 @@
+import type { ZodSchema } from "zod";
+
 /** A value found at a given path in the package.json */
 export type Value = object | string | boolean;
 
 /** A dot-separated (lodash) path to a value. */
 export type ValuePath = string;
 
-/** A Rule to reject or replace a value in package.json. A literal Value requires equality,
- * `undefined` means delete, `RexExp` means match, `ValueFactory` redirects the
- * check to other logic, null means leave alone. */
-export type ValueRule = Value | ValueFactory | RegExp | undefined | null;
+/**
+ * A Rule to reject or replace a value in package.json.
+ *
+ * A literal Value requires equality, `undefined` means delete, `RexExp` means
+ * match, `ValueFactory` redirects the check to other logic, null means
+ * explicitly no rule (leave alone).
+ */
+export type ValueRule =
+  | Value
+  | ValueFactory
+  | RegExp
+  | ZodSchema
+  | undefined
+  | null;
 
 /** Logic to calculate a value based on package context */
 export type ValueFactory = (packageMeta: PackageMeta) => ValueRule;
@@ -21,6 +33,7 @@ export interface PackageMeta {
     name: string;
     version: string;
     dependencies?: Record<string, string>;
+    devDependencies?: Record<string, string>;
     peerDependencies?: Record<string, string>;
   };
 }

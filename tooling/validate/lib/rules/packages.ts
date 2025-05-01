@@ -1,16 +1,17 @@
 import { sep } from "path";
 
-import { PackageMeta } from "../../types.js";
-import { isMember } from "../util.js";
+import { PackageMeta } from "../../types.ts";
+import { isMember } from "../util.ts";
 
 /** The scope prefix */
 export const SCOPE = "@myrepo";
 
-export const PACKAGE_TYPES = ["servers", "packages"] as const;
+export const PACKAGE_TYPES = ["servers", "modules"] as const;
 export type PackageType = (typeof PACKAGE_TYPES)[number];
 
-/** Extract the last three segments of the path to package.json.
- * This ends up like ["servers", "archetype-backend-script", "package.json"]
+/**
+ * Extract the last three segments of the path to package.json. This ends up
+ * like ["servers", "my-server-name", "package.json"]
  */
 function getTrailingPathSegments(options: { packagePath: string }) {
   const { packagePath } = options;

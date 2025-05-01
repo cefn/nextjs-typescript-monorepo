@@ -1,7 +1,7 @@
 import Image from "next/image";
 
-import { sum } from "@myrepo/sum";
-import { multiply } from "@myrepo/multiply";
+import { sum } from "../../../../modules/sum/src";
+import { multiply } from "../../../../modules/multiply/src";
 
 export default function Home() {
   const sumAnswer = sum(1, 1);

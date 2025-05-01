@@ -1,7 +1,7 @@
 import { dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 
-import { AbsolutePath } from "../types.js";
+import { AbsolutePath } from "../types.ts";
 
 export const SKELETON_RSYNC_OPTIONS = "--exclude=.gitkeep";
 
@@ -47,4 +47,14 @@ export function getRelativePackagePath(options: { packagePath: string }) {
     .replace(repoRoot, "")
     .replace("/package.json", "");
   return relativePath;
+}
+
+/** Returns a RegExp if a string starts and ends with `/` or null otherwise */
+export function maybeRegExp(maybeRegexString: string) {
+  const slashesMatch = maybeRegexString.match(/^\/([^/]+)\/$/);
+  if (slashesMatch) {
+    const regexString = slashesMatch[1];
+    return new RegExp(regexString);
+  }
+  return null;
 }
