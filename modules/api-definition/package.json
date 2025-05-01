@@ -1,0 +1,55 @@
+{
+  "name": "@myrepo/api-definition",
+  "version": "0.0.0",
+  "scripts": {
+    "test": "vitest run --coverage",
+    "compile": "tsc --noEmit",
+    "test:watch": "vitest",
+    "changeset": "echo 'Please run `pnpm changeset` from the monorepo root'",
+    "prepublishOnly": "pnpm run build",
+    "build": "vite build"
+  },
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "@myrepo": "./src/index.ts",
+        "types": "./dist/api-definition/src/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/api-definition/src/index.d.ts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "dependencies": {
+    "@myrepo/sum": "workspace:^",
+    "@zodios/core": "^10.9.6",
+    "zod": "^3.24.3"
+  },
+  "files": [
+    "README.md",
+    "dist",
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cefn/nextjs-typescript-monorepo.git",
+    "directory": "modules/api-definition"
+  },
+  "homepage": "https://github.com/cefn/nextjs-typescript-monorepo/tree/main/modules/api-definition/README.md",
+  "bugs": {
+    "url": "https://github.com/cefn/nextjs-typescript-monorepo/issues"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
+    "@vitest/coverage-v8": "^2.1.8",
+    "typescript": "^5.8.3",
+    "vite": "^6.0.6",
+    "vite-plugin-dts": "^4.4.0",
+    "vite-plugin-externalize-deps": "^0.8.0",
+    "vitest": "^2.1.8"
+  }
+}
