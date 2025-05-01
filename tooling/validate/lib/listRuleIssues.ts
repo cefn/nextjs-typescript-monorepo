@@ -8,34 +8,36 @@ import {
 import { minimatch } from "minimatch";
 import { resolve } from "path";
 import { isDeepStrictEqual } from "util";
+import { ZodSchema } from "zod";
 import { $ } from "zx";
 
-import { PACKAGE_JSON_RULES } from "../ruleConfig.js";
+import { PACKAGE_JSON_RULES } from "../ruleConfig.ts";
 import type {
   AbsolutePath,
   PackageJsonIssue,
   PackageMeta,
-  Value,
   ValuePath,
   ValueRule,
-} from "../types.js";
-import { PACKAGE_TYPES } from "./rules/packages.js";
-import { typedObjectEntries } from "./util.js";
+} from "../types.ts";
+import { PACKAGE_TYPES } from "./rules/packages.ts";
+import { maybeRegExp, typedObjectEntries } from "./util.ts";
+
+const RELATIVE_ROOT_PATH = "../../";
 
 /** Traverse monorepo to find package.json files */
 export async function listPackageJsonPaths(glob: string) {
   $.verbose = false;
-  const findStdOut = (
-    await $`find ${PACKAGE_TYPES} -mindepth 2 -maxdepth 2 -iname 'package.json'`
-  ).stdout;
-  if(findStdOut === ''){
-    throw new Error(`Could not find any packages to validate`)
-  }
-  const relativePackagePaths = findStdOut.trim().split("\n");
+  const relativePackagePaths = (
+    await $`cd ${RELATIVE_ROOT_PATH} && find ${PACKAGE_TYPES} -mindepth 2 -maxdepth 2 -iname 'package.json'`
+  ).stdout
+    .trim()
+    .split("\n");
   $.verbose = true;
   return relativePackagePaths
     .filter((packagePath) => minimatch(packagePath, glob))
-    .map((packagePath) => resolve(packagePath) as AbsolutePath);
+    .map(
+      (packagePath) => resolve(RELATIVE_ROOT_PATH, packagePath) as AbsolutePath,
+    );
 }
 
 /** Load path and data for a single package.json */
@@ -57,25 +59,52 @@ export function* listPackageJsonIssues(
   }
 }
 
+/** Traverse json yielding dot-separated paths to its leaf values */
+function* listLeafPaths(val: unknown, path = ""): Iterable<string> {
+  if (val === null || ["string", "number", "boolean"].includes(typeof val)) {
+    // yield the path if it's a leaf
+    yield path;
+  } else {
+    const entries = Array.isArray(val)
+      ? val.entries()
+      : typeof val === "object"
+        ? Object.entries(val)
+        : null;
+    if (entries !== null) {
+      // descend object or array members
+      const branchPrefix = path === "" ? path : `${path}.`;
+      for (const [memberKey, memberVal] of entries) {
+        yield* listLeafPaths(memberVal, `${branchPrefix}${memberKey}`);
+      }
+    }
+  }
+}
+
+function* listMatchingPairs(
+  packageJson: PackageMeta["packageJson"],
+  valuePath: ValuePath,
+) {
+  const maybeRegexPath = maybeRegExp(valuePath);
+  if (maybeRegexPath) {
+    for (const leafPath of listLeafPaths(packageJson)) {
+      if (maybeRegexPath.test(leafPath)) {
+        yield [leafPath, lodashGet(packageJson, leafPath)] as const;
+      }
+    }
+  } else {
+    const value = lodashGet(packageJson, valuePath);
+    if (typeof value !== "undefined") {
+      yield [valuePath, value] as const;
+    }
+  }
+}
+
 function* listRuleIssues(
   packageMeta: PackageMeta,
   valuePath: ValuePath,
   valueRule: ValueRule,
 ): Generator<PackageJsonIssue> {
   const { packageJson } = packageMeta;
-  const actualValue = lodashGet(packageJson, valuePath) as Value | undefined;
-
-  // handle RegExp rules which generate no expected value
-  if (valueRule instanceof RegExp && typeof actualValue === "string") {
-    if (!valueRule.test(actualValue)) {
-      yield {
-        message: `Value ${actualValue} doesn't match ${valueRule.toString()}`,
-        path: valuePath,
-        // fix: omitted. RegExp pattern rules have no automatic fix
-      };
-    }
-    return;
-  }
 
   // call factory until resulting value rule is not itself a factory
   let currentValueRule = valueRule;
@@ -88,33 +117,87 @@ function* listRuleIssues(
     // use factory to calculate next rule
     currentValueRule = currentValueRule(packageMeta);
   }
-  const expectedValue = currentValueRule;
+
+  // alias a string rule to be regex if it has slashes
+  const expectedValue =
+    (typeof currentValueRule === "string" && maybeRegExp(currentValueRule)) ||
+    currentValueRule;
 
   // null value means leave unchanged
   if (expectedValue === null) {
     return;
   }
 
-  // handle case where path should be undefined (fix by deletion)
-  if (expectedValue === undefined) {
-    if (actualValue !== undefined) {
-      yield {
-        message: `EXPECTED undefined FOUND ${JSON.stringify(actualValue)}`,
-        path: valuePath,
-        fix: ({ packageJson }) => lodashUnset(packageJson, valuePath),
-      };
+  // extract matching pairs from package json
+  const matchingPairs = [...listMatchingPairs(packageJson, valuePath)];
+
+  if (matchingPairs.length === 0) {
+    // missing match yields a failure unless...
+    // * path is a pattern (nothing HAS to match it)
+    // * value is undefined (item is MEANT to be missing)
+    // * value is schema and accepts undefined (item CAN be missing)
+    if (typeof expectedValue !== "undefined") {
+      if (expectedValue instanceof ZodSchema) {
+        if (!expectedValue.safeParse(undefined).success) {
+          yield {
+            message: `EXPECTED match for schema FOUND nothing`,
+            path: valuePath,
+            // fix: omitted. Zod schema rules have no automatic fix
+          };
+        }
+      } else {
+        yield {
+          message: `EXPECTED ${expectedValue} FOUND nothing`,
+          path: valuePath,
+          fix: ({ packageJson }) =>
+            lodashSet(packageJson, valuePath, expectedValue),
+        };
+      }
     }
-    return;
   }
 
-  // treat all other cases as expecting equality
-  if (!isDeepStrictEqual(expectedValue, actualValue)) {
-    const diffString = jsonDiff.diffString(actualValue, expectedValue);
-    yield {
-      message: `DIFFERS FROM RULE:\n${diffString}`,
-      path: valuePath,
-      fix: ({ packageJson }) =>
-        lodashSet(packageJson, valuePath, expectedValue),
-    };
+  // traverse all matching pairs
+  for (const [actualPath, actualValue] of matchingPairs) {
+    // handle case where path should be undefined (fix by deletion)
+    if (expectedValue === undefined) {
+      yield {
+        message: `EXPECTED undefined FOUND ${JSON.stringify(actualValue)}`,
+        path: actualPath,
+        fix: ({ packageJson }) => lodashUnset(packageJson, actualPath),
+      };
+    } else if (expectedValue instanceof ZodSchema) {
+      // handle zod schemas which generate no expected value
+      const parseResult = expectedValue.safeParse(actualValue);
+      if (parseResult.success === false) {
+        const { error } = parseResult;
+        const errorMessages = [...listLeafPaths(error)]
+          .filter((path) => path.endsWith("message"))
+          .map((path) => lodashGet(error, path));
+        yield {
+          message: `Value '${actualValue}' doesn't match schema for ${valuePath}.\n${errorMessages}`,
+          path: actualPath,
+          // fix: omitted. Zod schema rules have no automatic fix
+        };
+      }
+    } else if (valueRule instanceof RegExp && typeof actualValue === "string") {
+      // handle RegExp rules which generate no expected value
+      if (!valueRule.test(actualValue)) {
+        yield {
+          message: `Value ${actualValue} doesn't match ${valueRule.toString()}`,
+          path: actualPath,
+          // fix: omitted. RegExp pattern rules have no automatic fix
+        };
+      }
+    } else if (!isDeepStrictEqual(expectedValue, actualValue)) {
+      // treat all other cases as expecting equality
+      const diffString = jsonDiff.diffString(actualValue, expectedValue);
+      yield {
+        message: `DIFFERS FROM RULE:\n${diffString}`,
+        path: actualPath,
+        fix: ({ packageJson }) =>
+          lodashSet(packageJson, actualPath, expectedValue),
+      };
+      continue;
+    }
   }
 }

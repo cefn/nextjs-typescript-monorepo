@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "scripts": {
     "test:sum": "(node --import tsx src/index.ts & wait-on 'http://localhost:8165' && curl 'http://localhost:8165/sum?a=2&b=4'; kill $(jobs -p))",
-    "test:multiply": "(node --import tsx src/index.ts & wait-on 'http://localhost:8165' && curl 'http://localhost:8165/multiply?a=2&b=4'; kill $(jobs -p))"
+    "test:multiply": "(node --import tsx src/index.ts & wait-on 'http://localhost:8165' && curl 'http://localhost:8165/multiply?a=2&b=4'; kill $(jobs -p))",
+    "compile": "tsc --noEmit",
+    "changeset": "echo 'Please run `pnpm changeset` from the monorepo root'"
   },
-  "license": "MIT",
   "private": true,
   "type": "module",
   "dependencies": {
@@ -16,6 +17,17 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.0",
-    "wait-on": "^8.0.2"
+    "wait-on": "^8.0.2",
+    "typescript": "^5.8.3",
+    "vitest": "^2.1.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cefn/nextjs-typescript-monorepo.git",
+    "directory": "servers/express-with-dependencies"
+  },
+  "homepage": "https://github.com/cefn/nextjs-typescript-monorepo/tree/main/servers/express-with-dependencies/README.md",
+  "bugs": {
+    "url": "https://github.com/cefn/nextjs-typescript-monorepo/issues"
   }
 }

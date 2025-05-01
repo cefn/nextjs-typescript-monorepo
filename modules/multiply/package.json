@@ -1,0 +1,53 @@
+{
+  "name": "@myrepo/multiply",
+  "version": "0.0.0",
+  "scripts": {
+    "test": "vitest run --coverage",
+    "compile": "tsc --noEmit",
+    "test:watch": "vitest",
+    "changeset": "echo 'Please run `pnpm changeset` from the monorepo root'",
+    "prepublishOnly": "pnpm run build",
+    "build": "vite build"
+  },
+  "type": "module",
+  "exports": {
+    "./package.json": "./package.json",
+    ".": {
+      "import": {
+        "@myrepo": "./src/index.ts",
+        "types": "./dist/multiply/src/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/multiply/src/index.d.ts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "dependencies": {
+    "@myrepo/sum": "workspace:^"
+  },
+  "files": [
+    "README.md",
+    "dist",
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cefn/nextjs-typescript-monorepo.git",
+    "directory": "modules/multiply"
+  },
+  "homepage": "https://github.com/cefn/nextjs-typescript-monorepo/tree/main/modules/multiply/README.md",
+  "bugs": {
+    "url": "https://github.com/cefn/nextjs-typescript-monorepo/issues"
+  },
+  "devDependencies": {
+    "@rollup/plugin-typescript": "^11.1.6",
+    "typescript": "^5.8.3",
+    "vite": "^6.0.6",
+    "vitest": "^2.1.8",
+    "@vitest/coverage-v8": "^2.1.8",
+    "vite-plugin-dts": "^4.4.0",
+    "vite-plugin-externalize-deps": "^0.8.0"
+  }
+}
