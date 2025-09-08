@@ -10,6 +10,7 @@ export default defineConfig({
   resolve: {
     conditions: ["@myrepo"],
   },
+  ssr: { resolve: { conditions: ["@myrepo"] } },
   build: {
     rollupOptions: {
       plugins: [

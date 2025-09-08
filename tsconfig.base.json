@@ -1,0 +1,44 @@
+// aligned with https://github.com/colinhacks/live-typescript-monorepo/blob/d3f52904f7ffdcc4929c79a62843e373013557a8/custom-conditions/tsconfig.base.json
+// see the custom-conditions strategy described at https://colinhacks.com/essays/live-types-typescript-monorepo
+{
+  "compilerOptions": {
+    "outDir": "${configDir}/dist",
+    "incremental": true,
+    // ROKU: declarations only in modules' tsconfig
+    // "declaration": true,
+    // "declarationMap": true,
+    "customConditions": ["@myrepo"],
+
+    "lib": ["ESNext"],
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleDetection": "force",
+    "strict": true,
+    // "allowJs": true, // ROKU: All code should be typed
+    "esModuleInterop": true,
+    "moduleResolution": "bundler",
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    // ROKU: below values added to compilerOptions
+    "erasableSyntaxOnly": true, // ensure all packages are strip-types compatible
+    "noUncheckedIndexedAccess": true, // make array access strict
+    "noEmit": true, // don't output compiled files
+    "resolveJsonModule": true, // allow e.g. package.json to be imported
+    "inlineSourceMap": true, // inline source maps for debugging
+    "paths": {
+      // resolve local package names to corresponding source path
+      "@myrepo/*": ["./modules/*/src/index.ts"]
+    },
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true
+  },
+  "exclude": [
+    // Added by Roku web team
+    "node_modules",
+    "modules/*/dist",
+    "modules/*/node_modules",
+    "servers/*/dist",
+    "servers/*/node_modules",
+    "servers/*/.next"
+  ]
+}

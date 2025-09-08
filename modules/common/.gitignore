@@ -1,0 +1,4 @@
+v8-compile-cache-*
+dist
+*.tsbuildinfo
+.*-audit.json
