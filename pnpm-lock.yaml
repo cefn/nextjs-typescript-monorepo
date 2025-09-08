@@ -133,6 +133,9 @@ importers:
       '@myrepo/sum':
         specifier: workspace:^
         version: link:../../modules/sum
+      '@types/express':
+        specifier: ^5.0.1
+        version: 5.0.1
       '@zodios/core':
         specifier: ^10.9.6
         version: 10.9.6(axios@1.9.0)(zod@3.24.3)
@@ -146,9 +149,6 @@ importers:
         specifier: ^4.19.2
         version: 4.19.4
     devDependencies:
-      '@types/express':
-        specifier: ^5.0.0
-        version: 5.0.1
       typescript:
         specifier: ^5.8.3
         version: 5.8.3

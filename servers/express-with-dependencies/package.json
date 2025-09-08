@@ -13,13 +13,13 @@
     "@myrepo/api-definition": "workspace:^",
     "@myrepo/multiply": "workspace:^",
     "@myrepo/sum": "workspace:^",
+    "@types/express": "^5.0.1",
     "@zodios/core": "^10.9.6",
     "@zodios/express": "^10.6.1",
     "express": "^4.21.2",
     "tsx": "^4.19.2"
   },
   "devDependencies": {
-    "@types/express": "^5.0.0",
     "typescript": "^5.8.3",
     "vitest": "^2.1.8",
     "wait-on": "^8.0.2"

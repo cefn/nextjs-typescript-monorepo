@@ -1,7 +1,7 @@
 import { Zodios } from "@zodios/core";
 
-import { API } from "./api.ts";
+import { DICTIONARY_API } from "./api.ts";
 
 export function createClient(endpoint: string) {
-  return new Zodios(endpoint, API);
+  return new Zodios(endpoint, DICTIONARY_API);
 }

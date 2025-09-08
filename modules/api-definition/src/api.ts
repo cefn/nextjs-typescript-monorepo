@@ -23,26 +23,23 @@ export type DictionaryDownstreamResponse = z.infer<
   typeof DICTIONARY_DOWNSTREAM_RESPONSE_SCHEMA
 >;
 
-const DICTIONARY_BFF_SUCCESS_SCHEMA = z.object({
-  httpStatus: z.literal(200),
-  data: DICTIONARY_DOWNSTREAM_RESPONSE_SCHEMA,
-});
+export type DictionaryBffSuccess = {
+  httpStatus: 200;
+  body: DictionaryDownstreamResponse;
+};
 
-const DICTIONARY_BFF_FAILURE_SCHEMA = z.object({
-  httpStatus: z.union([z.literal(400), z.literal(500), z.literal(503)]),
+export type DictionaryBffFailure = {
+  httpStatus: 404 | 500 | 503;
+  message: string;
+};
+
+export type DictionaryBffResult = DictionaryBffSuccess | DictionaryBffFailure;
+
+const DICTIONARY_BFF_ERROR_SCHEMA = z.object({
   message: z.string(),
 });
 
-const DICTIONARY_BFF_RESPONSE_SCHEMA = z.union([
-  DICTIONARY_BFF_SUCCESS_SCHEMA,
-  DICTIONARY_BFF_FAILURE_SCHEMA,
-]);
-
-export type DictionaryBffResponse = z.infer<
-  typeof DICTIONARY_BFF_RESPONSE_SCHEMA
->;
-
-export const API = makeApi([
+export const DICTIONARY_API = makeApi([
   {
     method: "get",
     path: "/dictionary/:query",
@@ -55,6 +52,20 @@ export const API = makeApi([
         description: "The word to look up",
       },
     ],
-    response: DICTIONARY_BFF_RESPONSE_SCHEMA,
+    response: DICTIONARY_DOWNSTREAM_RESPONSE_SCHEMA,
+    errors: [
+      {
+        status: 404,
+        schema: DICTIONARY_BFF_ERROR_SCHEMA,
+      },
+      {
+        status: 500,
+        schema: DICTIONARY_BFF_ERROR_SCHEMA,
+      },
+      {
+        status: 503,
+        schema: DICTIONARY_BFF_ERROR_SCHEMA,
+      },
+    ],
   },
 ]);
