@@ -3,8 +3,6 @@
   "include": ["src/**/*"],
   "compilerOptions": {
     "outDir": "./dist",
-    "declaration": true,
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext"
+    "declaration": true
   }
 }
